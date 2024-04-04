@@ -1,0 +1,21 @@
+
+this is a sample rate conversion library. it's pretty unique on the inside, but still requires much fine tuning.
+at this stage, expect it to crash and spit out garbage.
+
+the main API is rather low-level, exposing directly the filter desing parameters, but there's also a couple of random presets
+
+not much of a documentation right now, but check out libfsrc/fsrc.h and the messy example program (fsrctool)
+the program accepts a quality preset name followed by one or more pairs of input and output file names.
+any input supported by libsndfile should work, output is always .wav
+the quality preset can be one of the following:
+
+mq16
+hq16
+mq20
+hq20
+mq24
+hq24
+push (best)
+
+the library creates an on-disk cache of filter coefficients.
+the files are stored in %APPDATA%\fsrc on Windows and ~/.libfsrc on *nix.

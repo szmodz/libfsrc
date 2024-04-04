@@ -1,0 +1,125 @@
+<html>
+<head>
+<title>FSRC</title><style type="text/css"> H1 { TEXT-ALIGN: center } H2 { FONT-SIZE: 14pt } H3 { FONT-SIZE: 11pt } H4 { FONT-FAMILY: Verdana,Arial; FONT-SIZE: 10pt } BODY { FONT-FAMILY: Verdana,Arial; FONT-SIZE: 10pt } TD { FONT-FAMILY: Verdana,Arial; FONT-SIZE: 10pt } </style></head>
+<body>
+
+<h1 align="center">FSRC - A sample rate conversion library</h1>
+
+<p>
+The available sample rate converters suck. They suck either at conversion quality, performance, code quality, or all of the above. FSRC aims to be a converter that doesn't suck.
+</p>
+<p>
+Specifically, it aims to provide:
+<ul>
+<li>Flexible API</li>
+<li>Fast filter design using actual optimization algorithms (instead of the ubiquitous Kaiser window)</li>
+<li>Good performance without compromising quality</li>
+<li>Incorporation of low-delay requirements</li>
+</ul>
+At this stage it is not feature complete and existing features are not debugged.
+If you want to play around, your best choice is the <a href="http://libfsrc.svn.sourceforge.net/viewvc/libfsrc.tar.gz?view=tar">source tarball</a>. You will also need <a href="https://sourceforge.net/projects/libfsrc/files/">FFTW<a> (Windows binaries <a href="https://sourceforge.net/projects/libfsrc/files/">here</a>) and <a href="http://www.cmake.org/">CMake</a>. (Oh, and a compiler. Tested using GCC, MSVC, and Sun C.)
+</p>
+<h2>The details</h2>
+<p>
+Linear phase FIR filters are currently designed using Lawson's algorithm with weight update envelopes (see <a href="http://www.spsoc.ntu.edu.sg/limyc/SP/1992_wls.pdf">A weighted least squares algorithm for quasi-equiripple FIR and IIR digital filter design</a>).
+The filters it produces are nearly optimal in the minimax sense (It can also be modified for least squares stopbands - see <a href="http://www.nt.tuwien.ac.at/fileadmin/users/gerhard/diss_Lang.pdf">this</a>). While not strictly elegant, it has the advantage that each iteration requires the solution of a Toeplitz system of linear equations and a couple of FFTs. The linear systems are solved quickly using preconditioned conjugate gradient.
+</p>
+<p>
+While comparably fast, filter design using this method can still take a couple of seconds at high quality settings, therefore FSRC is able to store the designs for later re-use, so it becomes a one-time effort.
+For this purpose, the included test program uses the %APP_DATA%\fsrc directory on Windows and ~/.libfsrc on *NIX.
+</p>
+<p>
+Currently, FSRC implements the usual polyphase rate conversion, as well as frequency domain resampling which, assuming a conversion factor of L/M, boils down to:
+<ul>
+<li>compute the DFT of an input block</li>
+<li>periodically extend the transform L times (equivalent to zero stuffing in the time domain)</li>
+<li>apply the filter (pointwise multiplication)</li>
+<li>divide the spectrum into M parts and add them together (equivalent of decimation in the time domain)</li>
+<li>compute inverse DFT</li>
+</ul>
+The downside is that the transforms sizes need to be of the form K*M and K*L respectively for the input and output, where K is an arbitrary positive integer. The rest is the same as in the usual block filtering. For optimal performance, a careful adjustment of the buffer sizes is required. This is not currently done, so the performance of this method should improve in the future.
+</p>
+<p>AFAIK, FSRC is also the only library which is able to perform optimal multistage decomposition of arbitrary (sans prime) conversion ratios on the fly.</p>
+
+<h2>Performance</h2>
+<p>
+As a teaser, this page will present a tiny comparison to <a href="http://www.mega-nerd.com/SRC/">libsamplerate</a>. It might not be entirely fair, since libsamplerate allows time-varying conversion factors, while FSRC does not (yet, at least).
+Still, libsamplerate seems to be the only library which is both high-quality and has a decent programming interface. I'll try to add a couple more into the mix later (like SOX).
+</p>
+
+
+<p>
+For the comparison, I've tried to use settings that match libsamplerate's best quality converter. <a href="http://audio.rightmark.org/">RMAA</a> was used to compare the quality - the 44.1kHz test signal was resampled to 96kHz and back. I've finally settled on the following:
+<ul>
+<li>Peak-to-peak passband ripple of 0.0001dB</li>
+<li>Stopband attenuation of 166dB</li>
+<li>Preserve 94% of bandwith below the Nyquist rate</li>
+</ul>
+Those were the specs fed into the API. The actual design might slightly exceed this spec.
+
+The results produced were as follows: 
+
+</p>
+
+<h1 align="center">libsamplerate<br>
+fsrc<br>
+</h1>
+<h2 align="center">RightMark Audio Analyzer test</h2><br>
+<h4 align="center">Testing chain: <br>
+Sampling mode: 32-bit, 44 kHz<br><br>
+</h4><br><br><br>
+<h3 align="center">Summary</h3>
+<table align="center" width="600" cellspacing="0" cellpadding="3" border="1">
+<tr align="center" bgcolor=#C0C0C0>
+<td><strong>Test</strong></strong></td><td><strong>libsamplerate</strong></td><td><strong>fsrc</td></tr>
+<tr align="center">
+<td bgcolor=#C0C0C0 align="left"><strong>Frequency response (from 40 Hz to 15 kHz), dB:</strong></td>
+<td>+0.00, -0.00</td><td>+0.00, -0.00</td></tr>
+<tr align="center">
+<td bgcolor=#C0C0C0 align="left"><strong>Noise level, dB (A):</strong></td>
+<td>-194.1</td><td>-210.8</td></tr>
+<tr align="center">
+<td bgcolor=#C0C0C0 align="left"><strong>Dynamic range, dB (A):</strong></td>
+<td>133.2</td><td>133.2</td></tr>
+<tr align="center">
+<td bgcolor=#C0C0C0 align="left"><strong>THD, %:</strong></td>
+<td>0.0000</td><td>0.0000</td></tr>
+<tr align="center">
+<td bgcolor=#C0C0C0 align="left"><strong>IMD + Noise, %:</strong></td>
+<td>0.0002</td><td>0.0002</td></tr>
+<tr align="center">
+<td bgcolor=#C0C0C0 align="left"><strong>Stereo crosstalk, dB:</strong></td>
+<td>-194.5</td><td>-213.2</td></tr>
+</table>
+<br><br><br><h3 align="center">Frequency response</h3>
+<p align="center"><img src="fresp.png" alt="Spectrum graph" width="504" height="315"></p>
+<p><br><h3 align="center">Dynamic range</h3>
+<p align="center"><img src="range.png" alt="Spectrum graph" width="504" height="315"></p>
+<p><br><h3 align="center">THD + Noise (at -3 dB FS)</h3>
+<p align="center"><img src="thd.png" alt="Spectrum graph" width="504" height="315"></p>
+<p><br><h3 align="center">THD Closeup</h3>
+<p align="center"><img src="thd-close.png" alt="Spectrum graph" width="504" height="315"></p>
+<p><br><h3 align="center">Intermodulation distortion</h3>
+<p align="center"><img src="imd.png" alt="Spectrum graph" width="504" height="315"></p>
+<p><br><h3 align="center">IMD Closeup</h3>
+<p align="center"><img src="imd-close.png" alt="Spectrum graph" width="504" height="315"></p>
+<p>&nbsp;</p>
+
+
+<p>
+To compare performance, I wrote a program which resamples a 5min long sine wave from 44.1kHz to 96kHz. You can find the code and Windows x64 binaries <a href="https://sourceforge.net/projects/libfsrc/files/">here</a> (libfsrc-libsamplerate-x64-bin.rar).
+You will also need the FFTW binaries and the <a href="http://www.microsoft.com/downloads/details.aspx?familyid=BA9257CA-337F-4B40-8C14-157CFDFFEE4E&displaylang=en">MSVC runtime</a> (if you don't have it already).
+</p>
+<p>
+The numbers were (Core 2 Duo T5600):
+<ul>
+<li>FSRC (Overlap-Save) - ~5.6s</li>
+<li>FSRC (Polyphase) - ~16.1s</li>
+<li>libsamplerate - ~103.9s</li>
+</ul>
+
+Keep in mind, the FFT resampling is not working at its peak, as mentioned at the top of the page.
+
+</p>
+</body>
+</html>

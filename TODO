@@ -1,0 +1,8 @@
+-track down bugs.
+-tweak the innards. there's lots of parameters to play with
+-improve portability. i've built it successfully on VS2005/2008 and Ubuntu 9.10 with gcc 4.something 
+-optimize buffer size selection for fft src
+-built-in benchmarking to select the optimal design?
+-intermediate phase filters
+-offline filtering API
+-investigate variable rate src

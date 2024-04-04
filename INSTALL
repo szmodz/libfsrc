@@ -1,0 +1,16 @@
+
+To build libfsrc you need to use CMake. CMake will generate the needed Makefiles / Project files for both *NIX and Windows environments.
+
+You will need FFTW (www.fftw.org) to build and use the library.
+
+Under Windows, CMake will generally be unable to locate the dependencies automatically, so you'll need to point it.
+
+FFTW_INCLUDE_DIR -> directory containing fftw3.h
+FFTW_LIBRARY -> the fftw3.lib (or whatever it's called) file
+FFTWF_LIBRARY -> fftw3f.lib 
+
+Prebuilt dependencies for Windows are available for download on the project's sourceforge page
+
+oh and under *nix the cmake script doesn't actually generate an install target, so you'll just have to copy it wherever you want it, until I or someone fixes it.
+
+
