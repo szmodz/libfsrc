@@ -1,0 +1,10 @@
+CMakeFiles/
+Makefile
+
+CMakeCache.txt
+cmake_install.cmake
+config.h
+
+# output files
+fsrctool/fsrctool
+libfsrc/libfsrcd.so

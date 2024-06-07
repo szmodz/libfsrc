@@ -1,10 +1,9 @@
 
-this is a sample rate conversion library. it's pretty unique on the inside, but still requires much fine tuning.
-at this stage, expect it to crash and spit out garbage.
+this is a sample rate conversion library. it's pretty unique on the inside, but still requires much fine tuning and testing.
 
 the main API is rather low-level, exposing directly the filter desing parameters, but there's also a couple of random presets
 
-not much of a documentation right now, but check out libfsrc/fsrc.h and the messy example program (fsrctool)
+not much of a documentation right now, but check out libfsrc/fsrc.h and the example program (fsrctool)
 the program accepts a quality preset name followed by one or more pairs of input and output file names.
 any input supported by libsndfile should work, output is always .wav
 the quality preset can be one of the following:
