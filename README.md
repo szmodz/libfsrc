@@ -1,9 +1,6 @@
 <h1 align="center">FSRC - A sample rate conversion library</h1>
 
 <p>
-The available sample rate converters suck. They suck either at conversion quality, performance, code quality, or all of the above. FSRC aims to be a converter that doesn't suck.
-</p>
-<p>
 Specifically, it aims to provide:
 <ul>
 <li>Flexible API</li>
@@ -12,7 +9,6 @@ Specifically, it aims to provide:
 <li>Incorporation of low-delay requirements</li>
 </ul>
 At this stage it is not feature complete and existing features are not debugged.
-If you want to play around, your best choice is the <a href="http://libfsrc.svn.sourceforge.net/viewvc/libfsrc.tar.gz?view=tar">source tarball</a>. You will also need <a href="https://sourceforge.net/projects/libfsrc/files/">FFTW<a> (Windows binaries <a href="https://sourceforge.net/projects/libfsrc/files/">here</a>) and <a href="http://www.cmake.org/">CMake</a>. (Oh, and a compiler. Tested using GCC, MSVC, and Sun C.)
 </p>
 <h2>The details</h2>
 <p>
@@ -38,7 +34,7 @@ The downside is that the transforms sizes need to be of the form K*M and K*L res
 
 <h2>Performance</h2>
 <p>
-As a teaser, this page will present a tiny comparison to <a href="http://www.mega-nerd.com/SRC/">libsamplerate</a>. It might not be entirely fair, since libsamplerate allows time-varying conversion factors, while FSRC does not (yet, at least).
+As a teaser, this readme will present a tiny comparison to <a href="http://www.mega-nerd.com/SRC/">libsamplerate</a>. It might not be entirely fair, since libsamplerate allows time-varying conversion factors, while FSRC does not (yet, at least).
 Still, libsamplerate seems to be the only library which is both high-quality and has a decent programming interface. I'll try to add a couple more into the mix later (like SOX).
 </p>
 
@@ -99,20 +95,3 @@ Sampling mode: 32-bit, 44 kHz<br><br>
 <p><br><h3 align="center">IMD Closeup</h3>
 <p align="center"><img src="htdocs/imd-close.png" alt="Spectrum graph" width="504" height="315"></p>
 <p>&nbsp;</p>
-
-
-<p>
-To compare performance, I wrote a program which resamples a 5min long sine wave from 44.1kHz to 96kHz. You can find the code and Windows x64 binaries <a href="https://sourceforge.net/projects/libfsrc/files/">here</a> (libfsrc-libsamplerate-x64-bin.rar).
-You will also need the FFTW binaries and the <a href="http://www.microsoft.com/downloads/details.aspx?familyid=BA9257CA-337F-4B40-8C14-157CFDFFEE4E&displaylang=en">MSVC runtime</a> (if you don't have it already).
-</p>
-<p>
-The numbers were (Core 2 Duo T5600):
-<ul>
-<li>FSRC (Overlap-Save) - ~5.6s</li>
-<li>FSRC (Polyphase) - ~16.1s</li>
-<li>libsamplerate - ~103.9s</li>
-</ul>
-
-Keep in mind, the FFT resampling is not working at its peak, as mentioned at the top of the page.
-
-</p>
