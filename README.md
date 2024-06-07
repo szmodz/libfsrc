@@ -95,3 +95,18 @@ Sampling mode: 32-bit, 44 kHz<br><br>
 <p><br><h3 align="center">IMD Closeup</h3>
 <p align="center"><img src="htdocs/imd-close.png" alt="Spectrum graph" width="504" height="315"></p>
 <p>&nbsp;</p>
+
+<p>
+To compare performance, I wrote a program which resamples a 5min long sine wave from 44.1kHz to 96kHz.
+</p>
+<p>
+The numbers were (Core 2 Duo T5600):
+<ul>
+<li>FSRC (Overlap-Save) - ~5.6s</li>
+<li>FSRC (Polyphase) - ~16.1s</li>
+<li>libsamplerate - ~103.9s</li>
+</ul>
+
+Keep in mind, the FFT resampling is not working at its peak, as mentioned at the top of the page.
+
+</p>
